@@ -118,12 +118,29 @@ if menu == "📅 Missions":
 # 📄 PAGE : INVENTAIRE
 if menu == "🎒 Inventaire":
     st.title("🎒 Inventaire")
-    for item, quantity in st.session_state["inventaire"].items():
-        st.markdown(f"**{item}** : {quantity}")
+
+    # Si l'inventaire est vide, l'utilisateur n'a rien
+    if not st.session_state["inventaire"]:
+        st.markdown("🧳 Votre inventaire est vide.")
+    else:
+        for item, quantity in st.session_state["inventaire"].items():
+            st.markdown(f"**{item}** : {quantity}")
 
 # 📄 PAGE : DONJONS
 if menu == "⚔️ Donjons":
     st.title("⚔️ Donjon : Combat épique !")
+
+    # Vérification si les données sont bien dans st.session_state
+    if "stats" not in st.session_state:
+        st.session_state["stats"] = {
+            "💪 Force": 0,
+            "🏃 Endurance": 0,
+            "🧠 Intelligence": 0,
+            "🎯 Agilité": 0,
+            "🔮 Mana": 0,
+            "❤️ Vitalité": 0,
+            "💼 Discipline": 0
+        }
 
     # Niveau de difficulté du donjon
     difficulty = st.selectbox("Choisis ton niveau de difficulté", ["Facile", "Moyen", "Difficile"])
