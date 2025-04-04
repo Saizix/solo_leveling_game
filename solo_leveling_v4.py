@@ -26,7 +26,7 @@ st.markdown("""
 
 # 📋 SIDEBAR - MENU NAVIGATION
 st.sidebar.title("📜 Menu")
-menu = st.sidebar.radio("Aller vers :", ["🏅 Stats & Rang", "📅 Missions", "🎒 Inventaire", "⚔️ Donjons"])
+menu = st.sidebar.radio("Aller vers :", ["🏅 Stats & Rang", "📅 Missions", "🎒 Inventaire", "🗡️ Donjon"])
 
 # 🧍 INFO PERSO
 niveau = st.session_state.get("niveau", 1)
@@ -34,21 +34,16 @@ xp = st.session_state.get("xp", 0)
 xp_max = 100 * niveau
 energie = st.session_state.get("energie", 100)
 stamina = st.session_state.get("stamina", 100)
-
-# Initialisation de l'inventaire et des missions si elles ne sont pas déjà définies
-if "inventaire" not in st.session_state:
-    st.session_state["inventaire"] = {"Potion de Vie": 2, "Potion d'Energie": 1}
-
-if "stats" not in st.session_state:
-    st.session_state["stats"] = {
-        "💪 Force": 0,
-        "🏃 Endurance": 0,
-        "🧠 Intelligence": 0,
-        "🎯 Agilité": 0,
-        "🔮 Mana": 0,
-        "❤️ Vitalité": 0,
-        "💼 Discipline": 0
-    }
+inventaire = st.session_state.get("inventaire", {"Potion de Vie": 2, "Potion d'Energie": 1})
+stats = st.session_state.get("stats", {
+    "💪 Force": 0,
+    "🏃 Endurance": 0,
+    "🧠 Intelligence": 0,
+    "🎯 Agilité": 0,
+    "🔮 Mana": 0,
+    "❤️ Vitalité": 0,
+    "💼 Discipline": 0
+})
 
 # 🧱 RANGS
 if niveau <= 5:
@@ -86,28 +81,46 @@ if menu == "🏅 Stats & Rang":
 
     with col2:
         st.markdown("### 📊 Statistiques")
-        for stat, value in st.session_state["stats"].items():
+        for stat, value in stats.items():
             st.markdown(f"{stat} : **{value}**")
 
 # 📄 PAGE : MISSIONS
 if menu == "📅 Missions":
     st.title(f"📅 Missions du {date.today().strftime('%d/%m/%Y')}")
-    
     missions = {
+        # Endurance
         "10 km à vélo 🚴 (+100)": ("🏃 Endurance", 100, 10),
         "30 min de marche 🚶 (+30)": ("🏃 Endurance", 30, 5),
+        "Course rapide 5km 🏃 (+75)": ("🏃 Endurance", 75, 8),
+        "Course rapide 10km 🏃 (+100)": ("🏃 Endurance", 100, 10),
+        "30 min cardio 🏋️‍♂️ (+50)": ("🏃 Endurance", 50, 7),
+        # Force
+        "Seance de musculation 💪 (+75)": ("💪 Force", 75, 8),
         "50 pompes 💪 (+20)": ("💪 Force", 20, 5),
-        "Lecture 1h 📚 (+60)": ("🧠 Intelligence", 60, 8),
-        "Méditer 10 min 🧘 (+15)": ("🔮 Mana", 15, 4),
+        "100 abdos 💪 (+25)": ("💪 Force", 25, 4),
+        # Intelligence
+        "Etudier pendant 1h 🧠 (+60)": ("🧠 Intelligence", 60, 8),
+        "Lecture 1h 📚 (+50)": ("🧠 Intelligence", 50, 6),
+        "Apprendre anglais 🇬🇧 (+40)": ("🧠 Intelligence", 40, 5),
+        # Mana
+        "Étirements 30 min 🧘‍♂️ (+15)": ("❤️ Vitalité", 15, 4),
+        "Méditer 10 min 🧘 (+40)": ("🔮 Mana", 40, 5),
+        # Vitalité
         "Dormir 8h 😴 (+40)": ("❤️ Vitalité", 40, 10),
-        "Journée sans procrastination ✅ (+50)": ("💼 Discipline", 50, 6),
+        "Boire 2L d'eau 💧 (+20)": ("❤️ Vitalité", 20, 3),
+        "Repas équilibré 🥗 (+30)": ("❤️ Vitalité", 30, 5),
+        "Étirements 30 min 🧘‍♂️ (+50)": ("❤️ Vitalité", 50, 7),
+        # Discipline
+        "Journée sans procrastination ✅ (+50)": ("💼 Discipline", 50, 6)
+        "Planifier la semaine ✅ (+40)": ("💼 Discipline", 40, 5),
+        "Suivre la to-do list à 100% ✅ (+60)": ("💼 Discipline", 60, 7),
     }
 
     gagne_xp = 0
     for label, (stat_key, xp_gain, cost) in missions.items():
         if st.checkbox(label, key=label):
             if stamina >= cost:
-                st.session_state["stats"][stat_key] += xp_gain
+                stats[stat_key] += xp_gain
                 xp += xp_gain
                 stamina -= cost
                 gagne_xp += xp_gain
@@ -118,57 +131,47 @@ if menu == "📅 Missions":
 # 📄 PAGE : INVENTAIRE
 if menu == "🎒 Inventaire":
     st.title("🎒 Inventaire")
+    for item, quantity in inventaire.items():
+        st.markdown(f"**{item}** : {quantity}")
 
-    # Si l'inventaire est vide, l'utilisateur n'a rien
-    if not st.session_state["inventaire"]:
-        st.markdown("🧳 Votre inventaire est vide.")
+# 🗡️ PAGE : DONJON
+if menu == "🗡️ Donjon":
+    st.title("🏰 Donjon - Affrontez des défis !")
+
+    # Donjon : Étapes
+    donjon_etapes = [
+        ("Faire 50 pompes 💪", 20, "💪 Force", 5),
+        ("Faire 100 squats 🏋️‍♂️", 25, "💪 Force", 7),
+        ("Courir 10 km 🚴", 50, "🏃 Endurance", 10),
+        ("Résoudre un puzzle 🧠", 40, "🧠 Intelligence", 5),
+        ("Méditer 15 min 🧘", 15, "🔮 Mana", 4),
+        ("Dormir 8h 😴", 40, "❤️ Vitalité", 10),
+        ("Lire 1h 📚", 30, "💼 Discipline", 6)
+    ]
+
+    if "etape_donjon" not in st.session_state:
+        st.session_state.etape_donjon = 0  # Commence à la première étape du donjon
+
+    etape_donjon = st.session_state.etape_donjon
+
+    if etape_donjon < len(donjon_etapes):
+        etape_nom, xp_gain, stat, cost = donjon_etapes[etape_donjon]
+
+        st.markdown(f"### Étape {etape_donjon + 1}: {etape_nom}")
+        st.progress(etape_donjon / len(donjon_etapes))
+
+        # Vérifier si le joueur a assez d'énergie pour accomplir l'étape
+        if st.button("Accomplir cette étape"):
+            if stamina >= cost:
+                stats[stat] += xp_gain
+                xp += xp_gain
+                stamina -= cost
+                st.session_state.etape_donjon += 1  # Passe à l'étape suivante
+                st.success(f"🎉 Étape terminée ! +{xp_gain} {stat}.")
+            else:
+                st.warning(f"⚠️ Pas assez d'énergie pour accomplir cette étape. Coût: {cost}.")
     else:
-        for item, quantity in st.session_state["inventaire"].items():
-            st.markdown(f"**{item}** : {quantity}")
-
-# 📄 PAGE : DONJONS
-if menu == "⚔️ Donjons":
-    st.title("⚔️ Donjon : Combat épique !")
-
-    # Vérification si les données sont bien dans st.session_state
-    if "stats" not in st.session_state:
-        st.session_state["stats"] = {
-            "💪 Force": 0,
-            "🏃 Endurance": 0,
-            "🧠 Intelligence": 0,
-            "🎯 Agilité": 0,
-            "🔮 Mana": 0,
-            "❤️ Vitalité": 0,
-            "💼 Discipline": 0
-        }
-
-    # Niveau de difficulté du donjon
-    difficulty = st.selectbox("Choisis ton niveau de difficulté", ["Facile", "Moyen", "Difficile"])
-
-    # Ennemis et récompenses
-    enemies = {
-        "Facile": {"nom": "Gobelin", "hp": 30, "force": 5, "xp": 100},
-        "Moyen": {"nom": "Orc", "hp": 50, "force": 10, "xp": 200},
-        "Difficile": {"nom": "Dragon", "hp": 100, "force": 20, "xp": 500},
-    }
-
-    enemy = enemies[difficulty]
-
-    st.markdown(f"### Ennemis : {enemy['nom']}")
-    st.markdown(f"**HP :** {enemy['hp']} | **Force :** {enemy['force']} | **Récompense :** {enemy['xp']} XP")
-
-    if st.button("Lancer le combat"):
-        # Combat aléatoire : chance de gagner en fonction de la force de l'utilisateur
-        user_strength = st.session_state["stats"]["💪 Force"]
-        combat_result = random.randint(1, user_strength + enemy["force"])
-
-        if combat_result > enemy["force"]:
-            st.success(f"🎉 Vous avez vaincu le {enemy['nom']} ! Vous gagnez {enemy['xp']} XP.")
-            xp += enemy["xp"]
-            st.session_state["xp"] = xp  # Mise à jour de l'XP
-            st.session_state["energie"] -= 10  # Consommation d'énergie
-        else:
-            st.error(f"💥 Vous avez perdu contre le {enemy['nom']}. Essayez de vous renforcer avant de revenir.")
+        st.success("🎉 Félicitations, tu as terminé ce donjon pour aujourd'hui !")
 
 # 🎉 LEVEL UP
 if xp >= xp_max:
@@ -183,5 +186,5 @@ st.session_state["niveau"] = niveau
 st.session_state["xp"] = xp
 st.session_state["energie"] = energie
 st.session_state["stamina"] = stamina
-st.session_state["stats"] = st.session_state["stats"]
-st.session_state["inventaire"] = st.session_state["inventaire"]
+st.session_state["stats"] = stats
+st.session_state["inventaire"] = inventaire
