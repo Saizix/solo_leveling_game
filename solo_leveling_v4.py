@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import date
+import random
 
 # 🎮 CONFIG PAGE
 st.set_page_config(page_title="Solo Leveling IRL", page_icon="🗡️", layout="wide")
@@ -25,7 +26,7 @@ st.markdown("""
 
 # 📋 SIDEBAR - MENU NAVIGATION
 st.sidebar.title("📜 Menu")
-menu = st.sidebar.radio("Aller vers :", ["🏅 Stats & Rang", "📅 Missions", "🎒 Inventaire", "🗡️ Donjon"])
+menu = st.sidebar.radio("Aller vers :", ["🏅 Stats & Rang", "📅 Missions", "🎒 Inventaire"])
 
 # 🧍 INFO PERSO
 niveau = st.session_state.get("niveau", 1)
@@ -86,66 +87,37 @@ if menu == "🏅 Stats & Rang":
 # 📄 PAGE : MISSIONS
 if menu == "📅 Missions":
     st.title(f"📅 Missions du {date.today().strftime('%d/%m/%Y')}")
+    
     missions = {
         # Endurance
         "10 km à vélo 🚴 (+100)": ("🏃 Endurance", 100, 10),
         "30 min de marche 🚶 (+30)": ("🏃 Endurance", 30, 5),
         "30 min cardio 🏋️‍♂️ (+50)": ("🏃 Endurance", 50, 7),
-        "1h de course 🏃 (+150)": ("🏃 Endurance", 150, 15),
-        "5 km en randonnée 🏞️ (+80)": ("🏃 Endurance", 80, 10),
-        "Faire 1h de vélo en extérieur 🚴‍♂️ (+150)": ("🏃 Endurance", 150, 12),
-        "Escalader une montagne 🏔️ (+200)": ("🏃 Endurance", 200, 20),
-        "Natation 30 min 🏊‍♂️ (+100)": ("🏃 Endurance", 100, 10),
-
+        "Course rapide 5km 🏃 (+75)": ("🏃 Endurance", 75, 8),
+        "Randonnée 2h 🏞️ (+120)": ("🏃 Endurance", 120, 12),
         # Force
         "50 pompes 💪 (+20)": ("💪 Force", 20, 5),
         "100 abdos 💪 (+25)": ("💪 Force", 25, 4),
-        "100 tractions 💪 (+30)": ("💪 Force", 30, 8),
-        "20 min de gainage 🧘 (+50)": ("💪 Force", 50, 7),
-        "200 squats 🏋️‍♂️ (+60)": ("💪 Force", 60, 15),
-        "Soulever 50 kg 💪 (+100)": ("💪 Force", 100, 20),
-        "Faire 30 burpees 🔥 (+50)": ("💪 Force", 50, 12),
-
+        "Squats 30 répétitions 💪 (+40)": ("💪 Force", 40, 6),
+        "Tractions 10 💪 (+50)": ("💪 Force", 50, 7),
         # Intelligence
         "Lecture 1h 📚 (+60)": ("🧠 Intelligence", 60, 8),
         "Apprendre anglais 🇬🇧 (+40)": ("🧠 Intelligence", 40, 5),
-        "Révision pour un examen 📖 (+100)": ("🧠 Intelligence", 100, 12),
-        "Rédiger un résumé de livre 📖 (+50)": ("🧠 Intelligence", 50, 6),
-        "Résoudre un problème mathématique compliqué ➗ (+80)": ("🧠 Intelligence", 80, 10),
-        "Rédiger un essai de 500 mots 📝 (+120)": ("🧠 Intelligence", 120, 15),
-        "Apprendre 20 nouveaux mots dans une langue étrangère 🗣️ (+60)": ("🧠 Intelligence", 60, 7),
-        "Suivre un cours en ligne pendant 1h 💻 (+100)": ("🧠 Intelligence", 100, 15),
-
+        "Résolution de problèmes logiques 🧠 (+50)": ("🧠 Intelligence", 50, 6),
+        "Mémorisation de vocabulaire 🧠 (+30)": ("🧠 Intelligence", 30, 4),
         # Mana
         "Méditer 10 min 🧘 (+15)": ("🔮 Mana", 15, 4),
-        "Visualisation 10 min 💭 (+20)": ("🔮 Mana", 20, 5),
-        "Réduire son temps d'écran 1h 📴 (+30)": ("🔮 Mana", 30, 6),
-        "30 min de visualisation de ses objectifs 🎯 (+25)": ("🔮 Mana", 25, 7),
-        "Lire un livre sur la gestion du stress 📚 (+50)": ("🔮 Mana", 50, 8),
-        "Créer un tableau de vision 🔮 (+35)": ("🔮 Mana", 35, 6),
-        "Suivre une séance de relaxation guidée 🌙 (+40)": ("🔮 Mana", 40, 8),
-
+        "Réduction du stress avec yoga 🔮 (+25)": ("🔮 Mana", 25, 6),
+        "Journée sans distractions numériques 🔮 (+40)": ("🔮 Mana", 40, 8),
         # Vitalité
         "Dormir 8h 😴 (+40)": ("❤️ Vitalité", 40, 10),
-        "Boire 2L d'eau 💧 (+20)": ("❤️ Vitalité", 20, 4),
-        "Manger équilibré 🍎 (+30)": ("❤️ Vitalité", 30, 6),
-        "Prendre une douche froide 🚿 (+30)": ("❤️ Vitalité", 30, 7),
-        "Marcher dans la nature 1h 🌳 (+40)": ("❤️ Vitalité", 40, 8),
-        "Faire une pause sans écran pendant 30 min 📴 (+20)": ("❤️ Vitalité", 20, 5),
-
+        "Boire 2L d'eau 💧 (+20)": ("❤️ Vitalité", 20, 3),
+        "Repas équilibré 🥗 (+30)": ("❤️ Vitalité", 30, 5),
+        "Étirements 30 min 🧘‍♂️ (+50)": ("❤️ Vitalité", 50, 7),
         # Discipline
         "Journée sans procrastination ✅ (+50)": ("💼 Discipline", 50, 6),
-        "Planification d'objectifs 🗂️ (+40)": ("💼 Discipline", 40, 5),
-        "Faire une to-do list et la compléter ✅ (+30)": ("💼 Discipline", 30, 4),
-        "Compléter une liste de tâches difficile ✅ (+60)": ("💼 Discipline", 60, 10),
-        "Méditer 15 min en pleine conscience 🧘‍♀️ (+40)": ("💼 Discipline", 40, 8),
-        "Tenir un journal pendant 1 semaine 📝 (+70)": ("💼 Discipline", 70, 12),
-        "Planifier la semaine à venir 📅 (+50)": ("💼 Discipline", 50, 6),
-
-        # Missions spéciales
-        "Participer à un défi de groupe (100 km en 1 mois) 💪 (+500)": ("🏃 Endurance", 500, 50),
-        "Accomplir un objectif important à long terme 🎯 (+1000)": ("💪 Force", 1000, 100),
-        "Suivre un programme de développement personnel pendant 30 jours 🌟 (+1000)": ("🧠 Intelligence", 1000, 120),
+        "Planifier la semaine ✅ (+40)": ("💼 Discipline", 40, 5),
+        "Suivre la to-do list à 100% ✅ (+60)": ("💼 Discipline", 60, 7),
     }
 
     gagne_xp = 0
@@ -159,3 +131,25 @@ if menu == "📅 Missions":
                 st.success(f"✅ +{xp_gain} {stat_key}")
             else:
                 st.warning(f"⚠️ Pas assez de stamina. Coût: {cost}")
+
+# 📄 PAGE : INVENTAIRE
+if menu == "🎒 Inventaire":
+    st.title("🎒 Inventaire")
+    for item, quantity in inventaire.items():
+        st.markdown(f"**{item}** : {quantity}")
+
+# 🎉 LEVEL UP
+if xp >= xp_max:
+    niveau += 1
+    xp -= xp_max
+    xp_max = 100 * niveau
+    st.balloons()
+    st.success(f"🆙 Niveau supérieur ! Tu es maintenant niveau {niveau} ({rang})")
+
+# 💾 SAUVEGARDE
+st.session_state["niveau"] = niveau
+st.session_state["xp"] = xp
+st.session_state["energie"] = energie
+st.session_state["stamina"] = stamina
+st.session_state["stats"] = stats
+st.session_state["inventaire"] = inventaire
